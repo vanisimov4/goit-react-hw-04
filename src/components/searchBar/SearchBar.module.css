@@ -1,3 +1,13 @@
 .header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #3c3579;
+  height: 30px;
+}
+
+.header form {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }

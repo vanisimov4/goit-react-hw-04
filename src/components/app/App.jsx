@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useState, useEffect } from 'react';
 
 import SearchBar from '../searchBar/SearchBar';
 import ImageGallery from '../imageGallery/ImageGallery';
@@ -9,16 +10,31 @@ import './App.css';
 function App() {
   const [count, setCount] = useState(0);
 
-  const [searchValue, setSearchValue] = useState('');
+  // const [searchValue, setSearchValue] = useState('');
 
-  const onSubmit = event => {
-    setSearchValue(event.target.value);
-    console.log(searchValue);
+  // const onSubmit = event => {
+  //   setSearchValue(event.target.value);
+  //   console.log(searchValue);
+  // };
+
+  useEffect(() => {
+    async function fetchArticles() {
+      const response = await axios.get(
+        '<https://api.unsplash.com/photos/?client_id=agCoAE_BIGSEpvgvLxJ6ULj4TKLWHwrqFtAGIwtc7sY>'
+      );
+      console.log(response);
+    }
+
+    fetchArticles();
+  }, []);
+
+  const handleSearch = userData => {
+    console.log(userData);
   };
 
   return (
     <>
-      <SearchBar onSubmit={onSubmit}></SearchBar>
+      <SearchBar onSubmit={handleSearch}></SearchBar>
       <Loader></Loader>
       <ImageGallery></ImageGallery>
       <LoadMoreBtn></LoadMoreBtn>
