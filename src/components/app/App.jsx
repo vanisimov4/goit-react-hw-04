@@ -8,7 +8,7 @@ import LoadMoreBtn from '../loadMoreBtn/LoadMoreBtn';
 import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [articles, setArticles] = useState([]);
 
   // const [searchValue, setSearchValue] = useState('');
 
@@ -20,9 +20,10 @@ function App() {
   useEffect(() => {
     async function fetchArticles() {
       const response = await axios.get(
-        '<https://api.unsplash.com/photos/?client_id=agCoAE_BIGSEpvgvLxJ6ULj4TKLWHwrqFtAGIwtc7sY>'
+        'https://api.unsplash.com/photos/?client_id=agCoAE_BIGSEpvgvLxJ6ULj4TKLWHwrqFtAGIwtc7sY'
       );
-      console.log(response);
+      console.log(response.data);
+      setArticles(response.data);
     }
 
     fetchArticles();
@@ -38,6 +39,18 @@ function App() {
       <Loader></Loader>
       <ImageGallery></ImageGallery>
       <LoadMoreBtn></LoadMoreBtn>
+
+      {articles.length > 0 && (
+        <ul>
+          {articles.map(({ id, urls, slug }) => (
+            <li key={id}>
+              <a href={urls.small} target="_blank" rel="noreferrer noopener">
+                {slug}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   );
 }
