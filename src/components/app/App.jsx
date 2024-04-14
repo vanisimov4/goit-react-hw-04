@@ -9,7 +9,11 @@ import './App.css';
 
 function App() {
   const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  const handleSearch = userData => {
+    console.log(userData);
+  };
   // const [searchValue, setSearchValue] = useState('');
 
   // const onSubmit = event => {
@@ -19,38 +23,29 @@ function App() {
 
   useEffect(() => {
     async function fetchArticles() {
-      const response = await axios.get(
-        'https://api.unsplash.com/photos/?client_id=agCoAE_BIGSEpvgvLxJ6ULj4TKLWHwrqFtAGIwtc7sY'
-      );
-      console.log(response.data);
-      setArticles(response.data);
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          'https://api.unsplash.com/photos/?client_id=agCoAE_BIGSEpvgvLxJ6ULj4TKLWHwrqFtAGIwtc7sY'
+        );
+        console.log(response.data);
+        setArticles(response.data);
+      } catch (error) {
+        // Тут будемо обробляти помилку
+      } finally {
+        setLoading(false);
+      }
     }
 
     fetchArticles();
   }, []);
 
-  const handleSearch = userData => {
-    console.log(userData);
-  };
-
   return (
     <>
       <SearchBar onSubmit={handleSearch}></SearchBar>
-      <Loader></Loader>
-      <ImageGallery></ImageGallery>
+      {articles.length > 0 && <ImageGallery items={articles}></ImageGallery>}
+      {loading && <Loader></Loader>}
       <LoadMoreBtn></LoadMoreBtn>
-
-      {articles.length > 0 && (
-        <ul>
-          {articles.map(({ id, urls, slug }) => (
-            <li key={id}>
-              <a href={urls.small} target="_blank" rel="noreferrer noopener">
-                {slug}
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
     </>
   );
 }
