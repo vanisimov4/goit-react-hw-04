@@ -10,6 +10,7 @@ import './App.css';
 function App() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const handleSearch = userData => {
     console.log(userData);
@@ -24,14 +25,24 @@ function App() {
   useEffect(() => {
     async function fetchArticles() {
       try {
+        const BASE_URL = 'https://api.unsplash.com';
+        const END_POINT = '/photos/';
+        const url = BASE_URL + END_POINT;
+        const params = {
+          client_id: 'agCoAE_BIGSEpvgvLxJ6ULj4TKLWHwrqFtAGIwtc7sY',
+          // q: encodeURIComponent(query),
+          // image_type: 'photo',
+          // orientation: 'horizontal',
+          // safesearch: true,
+          per_page: 12,
+          // page: currentPage,
+        };
         setLoading(true);
-        const response = await axios.get(
-          'https://api.unsplash.com/photos/?client_id=agCoAE_BIGSEpvgvLxJ6ULj4TKLWHwrqFtAGIwtc7sY'
-        );
+        const response = await axios.get(url, { params });
         console.log(response.data);
         setArticles(response.data);
       } catch (error) {
-        // Тут будемо обробляти помилку
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -45,6 +56,9 @@ function App() {
       <SearchBar onSubmit={handleSearch}></SearchBar>
       {articles.length > 0 && <ImageGallery items={articles}></ImageGallery>}
       {loading && <Loader></Loader>}
+      {error && (
+        <p>Whoops, something went wrong! Please try reloading this page!</p>
+      )}
       <LoadMoreBtn></LoadMoreBtn>
     </>
   );
