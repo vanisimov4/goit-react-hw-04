@@ -1,20 +1,33 @@
-import axios from 'axios';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
+import fetchPhotosByName from '../../unsplash-api';
 import SearchBar from '../searchBar/SearchBar';
 import ImageGallery from '../imageGallery/ImageGallery';
 import Loader from '../loader/Loader';
 import LoadMoreBtn from '../loadMoreBtn/LoadMoreBtn';
 import ErrorMessage from '../errorMessage/ErrorMessage';
+import ImageModal from '../imageModal/ImageModal';
 import './App.css';
 
 function App() {
-  const [articles, setArticles] = useState([]);
+  const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
-  const handleSearch = userData => {
+  const handleSearch = async userData => {
     console.log(userData);
+    try {
+      setPhotos([]);
+      setError(false);
+      setLoading(true);
+      const data = await fetchPhotosByName(userData);
+      console.log(data);
+      setPhotos(data);
+    } catch (error) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   };
   // const [searchValue, setSearchValue] = useState('');
 
@@ -23,48 +36,14 @@ function App() {
   //   console.log(searchValue);
   // };
 
-  useEffect(() => {
-    async function fetchArticles() {
-      try {
-        const BASE_URL = 'https://api.unsplash.com';
-        const END_POINT = '/search/photos/';
-        const url = BASE_URL + END_POINT;
-        const query = 'ice';
-        const params = {
-          // q: encodeURIComponent(query),
-          query: query,
-          // image_type: 'photo',
-          // orientation: 'horizontal',
-          // safesearch: true,
-          per_page: 12,
-          page: 3,
-          // page: currentPage,
-          client_id: 'agCoAE_BIGSEpvgvLxJ6ULj4TKLWHwrqFtAGIwtc7sY',
-        };
-        setLoading(true);
-        // const response = await axios.get(
-        //   'https://api.unsplash.com/search/photos/?query=nature?&client_id=agCoAE_BIGSEpvgvLxJ6ULj4TKLWHwrqFtAGIwtc7sY'
-        // );
-        const response = await axios.get(url, { params });
-        console.log(response.data.results);
-        setArticles(response.data.results);
-      } catch (error) {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchArticles();
-  }, []);
-
   return (
     <>
       <SearchBar onSubmit={handleSearch}></SearchBar>
-      {articles.length > 0 && <ImageGallery items={articles}></ImageGallery>}
+      {photos.length > 0 && <ImageGallery items={photos}></ImageGallery>}
       {loading && <Loader></Loader>}
       {error && <ErrorMessage />}
-      <LoadMoreBtn></LoadMoreBtn>
+      {photos.length > 0 && <LoadMoreBtn></LoadMoreBtn>}
+      <ImageModal></ImageModal>
     </>
   );
 }

@@ -6,15 +6,12 @@ const SearchBar = ({ onSubmit }) => {
     evt.preventDefault();
 
     const form = evt.target;
-    const { textSearch } = form.elements;
-    if (textSearch.value === '') {
+    const textSearch = form.elements.textSearch.value.trim();
+    if (textSearch === '') {
       return toast.error('text must be entered to search for images');
     }
-    onSubmit({
-      textSearch: textSearch.value,
-    });
+    onSubmit(textSearch);
     // console.log(textSearch);
-    // console.log(textSearch.value);
     form.reset();
   };
 
