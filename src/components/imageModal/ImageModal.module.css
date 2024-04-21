@@ -1,3 +1,13 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 980;
+}
+
 .modal {
   position: absolute;
   top: 50%;
@@ -6,14 +16,16 @@
   background-color: white;
   padding: 20px;
   z-index: 1000;
+  width: 80%;
+  height: 80%;
+  margin: auto;
+  border: none;
+  outline: none;
+  padding: 0;
 }
 
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
+.modal img {
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Темний колір тла з прозорістю */
-  z-index: 995; /* Забезпечте, щоб фон був під модальним вікном */
+  object-fit: cover;
 }

@@ -1,5 +1,4 @@
 import { animateScroll } from 'react-scroll';
-// import Modal from 'react-modal';
 
 import { useState } from 'react';
 
@@ -20,16 +19,13 @@ function App() {
   const [page, setPage] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [showBtn, setShowBtn] = useState(false);
 
   const handleSearch = userData => {
     closeModal();
     setPhotos([]);
     setSearchStored(userData);
     setPage(page + 1);
-    console.log(photos);
-    console.log(searchStored);
-    console.log(userData);
-
     fetchData(userData, page);
   };
 
@@ -37,11 +33,15 @@ function App() {
     try {
       setError(false);
       setLoading(true);
-      const data = await fetchPhotosByName(searchData, page);
+      const { results, total_pages } = await fetchPhotosByName(
+        searchData,
+        page
+      );
+      setShowBtn(total_pages && total_pages !== page);
       if (searchData === searchStored) {
-        setPhotos([...photos, ...data]);
+        setPhotos([...photos, ...results]);
       } else {
-        setPhotos(data);
+        setPhotos(results);
       }
     } catch (error) {
       setError(true);
@@ -52,8 +52,6 @@ function App() {
 
   function handleClick() {
     setPage(page + 1);
-    console.log(page);
-    console.log(searchStored);
     fetchData(searchStored, page);
     animateScroll.scrollToBottom({
       duration: 800, // тривалість анімації в мілісекундах
@@ -62,8 +60,10 @@ function App() {
   }
 
   const openModal = image => {
-    setSelectedImage(image);
-    setIsOpen(true);
+    if (!isOpen) {
+      setSelectedImage(image);
+      setIsOpen(true);
+    }
   };
 
   const closeModal = () => {
@@ -71,13 +71,6 @@ function App() {
   };
 
   const onClickModal = image => openModal(image);
-
-  // const [searchValue, setSearchValue] = useState('');
-
-  // const onSubmit = event => {
-  //   setSearchValue(event.target.value);
-  //   console.log(searchValue);
-  // };
 
   return (
     <>
@@ -87,9 +80,7 @@ function App() {
       )}
       {loading && <Loader></Loader>}
       {error && <ErrorMessage />}
-      {photos.length > 0 && (
-        <LoadMoreBtn handleClick={handleClick}></LoadMoreBtn>
-      )}
+      {showBtn && <LoadMoreBtn handleClick={handleClick}></LoadMoreBtn>}
       <ImageModal
         isOpen={isOpen}
         imageUrl={selectedImage}
@@ -100,24 +91,3 @@ function App() {
 }
 
 export default App;
-
-// <div>
-//       <a href="https://vitejs.dev" target="_blank">
-//         <img src={viteLogo} className="logo" alt="Vite logo" />
-//       </a>
-//       <a href="https://react.dev" target="_blank">
-//         <img src={reactLogo} className="logo react" alt="React logo" />
-//       </a>
-//     </div>
-//     <h1>Vite + React is amazing</h1>
-//     <div className="card">
-//       <button onClick={() => setCount(count => count + 1)}>
-//         count is {count}
-//       </button>
-//       <p>
-//         Edit <code>src/App.jsx</code> and save to test HMR
-//       </p>
-//     </div>
-//     <p className="read-the-docs">
-//       Click on the Vite and React logos to learn more
-//     </p>
