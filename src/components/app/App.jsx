@@ -1,3 +1,6 @@
+import { animateScroll } from 'react-scroll';
+// import Modal from 'react-modal';
+
 import { useState } from 'react';
 
 import fetchPhotosByName from '../../unsplash-api';
@@ -10,29 +13,36 @@ import ImageModal from '../imageModal/ImageModal';
 import './App.css';
 
 function App() {
-  const [search, setSearch] = useState('');
+  const [searchStored, setSearchStored] = useState('');
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [page, setPage] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const handleSearch = userData => {
-    setSearch(userData);
-    setPage(page + 1);
+    closeModal();
     setPhotos([]);
-    console.log(page);
-    console.log(search);
+    setSearchStored(userData);
+    setPage(page + 1);
+    console.log(photos);
+    console.log(searchStored);
     console.log(userData);
 
     fetchData(userData, page);
   };
 
-  async function fetchData(search, page) {
+  async function fetchData(searchData, page) {
     try {
       setError(false);
       setLoading(true);
-      const data = await fetchPhotosByName(search, page);
-      setPhotos(data);
+      const data = await fetchPhotosByName(searchData, page);
+      if (searchData === searchStored) {
+        setPhotos([...photos, ...data]);
+      } else {
+        setPhotos(data);
+      }
     } catch (error) {
       setError(true);
     } finally {
@@ -43,9 +53,24 @@ function App() {
   function handleClick() {
     setPage(page + 1);
     console.log(page);
-    console.log(search);
-    fetchData(search, page);
+    console.log(searchStored);
+    fetchData(searchStored, page);
+    animateScroll.scrollToBottom({
+      duration: 800, // тривалість анімації в мілісекундах
+      smooth: 'easeInOutQuint', // згладжування анімації
+    });
   }
+
+  const openModal = image => {
+    setSelectedImage(image);
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  const onClickModal = image => openModal(image);
 
   // const [searchValue, setSearchValue] = useState('');
 
@@ -57,13 +82,19 @@ function App() {
   return (
     <>
       <SearchBar onSubmit={handleSearch}></SearchBar>
-      {photos.length > 0 && <ImageGallery items={photos}></ImageGallery>}
+      {photos.length > 0 && (
+        <ImageGallery items={photos} onClickModal={onClickModal}></ImageGallery>
+      )}
       {loading && <Loader></Loader>}
       {error && <ErrorMessage />}
       {photos.length > 0 && (
         <LoadMoreBtn handleClick={handleClick}></LoadMoreBtn>
       )}
-      <ImageModal></ImageModal>
+      <ImageModal
+        isOpen={isOpen}
+        imageUrl={selectedImage}
+        onClose={closeModal}
+      ></ImageModal>
     </>
   );
 }
