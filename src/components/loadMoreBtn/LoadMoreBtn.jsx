@@ -1,5 +1,6 @@
-const LoadMoreBtn = () => {
-  return <button type="button">Load more</button>;
+const LoadMoreBtn = ({ handleClick }) => {
+  // const handleSubmit () => { };
+  return <button onClick={handleClick}>Load more</button>;
 };
 
 export default LoadMoreBtn;

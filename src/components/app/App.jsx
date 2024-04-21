@@ -10,25 +10,43 @@ import ImageModal from '../imageModal/ImageModal';
 import './App.css';
 
 function App() {
+  const [search, setSearch] = useState('');
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [page, setPage] = useState(1);
 
-  const handleSearch = async userData => {
+  const handleSearch = userData => {
+    setSearch(userData);
+    setPage(page + 1);
+    setPhotos([]);
+    console.log(page);
+    console.log(search);
     console.log(userData);
+
+    fetchData(userData, page);
+  };
+
+  async function fetchData(search, page) {
     try {
-      setPhotos([]);
       setError(false);
       setLoading(true);
-      const data = await fetchPhotosByName(userData);
-      console.log(data);
+      const data = await fetchPhotosByName(search, page);
       setPhotos(data);
     } catch (error) {
       setError(true);
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  function handleClick() {
+    setPage(page + 1);
+    console.log(page);
+    console.log(search);
+    fetchData(search, page);
+  }
+
   // const [searchValue, setSearchValue] = useState('');
 
   // const onSubmit = event => {
@@ -42,7 +60,9 @@ function App() {
       {photos.length > 0 && <ImageGallery items={photos}></ImageGallery>}
       {loading && <Loader></Loader>}
       {error && <ErrorMessage />}
-      {photos.length > 0 && <LoadMoreBtn></LoadMoreBtn>}
+      {photos.length > 0 && (
+        <LoadMoreBtn handleClick={handleClick}></LoadMoreBtn>
+      )}
       <ImageModal></ImageModal>
     </>
   );

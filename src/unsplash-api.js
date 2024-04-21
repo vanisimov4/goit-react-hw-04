@@ -2,16 +2,13 @@ import axios from 'axios';
 
 axios.defaults.baseURL = 'https://api.unsplash.com';
 
-const fetchPhotosByName = async name => {
-  // const BASE_URL = 'https://api.unsplash.com';
+const fetchPhotosByName = async (name, page) => {
   const END_POINT = '/search/photos/';
-  // const url = BASE_URL + END_POINT;
-  // const query = 'moon';
   const params = {
     query: encodeURIComponent(name),
     orientation: 'landscape',
     per_page: 12,
-    page: 1,
+    page: page,
     // page: currentPage,
     client_id: 'agCoAE_BIGSEpvgvLxJ6ULj4TKLWHwrqFtAGIwtc7sY',
   };
