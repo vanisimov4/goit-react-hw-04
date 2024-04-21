@@ -1,6 +1,6 @@
 import { animateScroll } from 'react-scroll';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import fetchPhotosByName from '../../unsplash-api';
 import SearchBar from '../searchBar/SearchBar';
@@ -12,7 +12,7 @@ import ImageModal from '../imageModal/ImageModal';
 import './App.css';
 
 function App() {
-  const [searchStored, setSearchStored] = useState('');
+  const [query, setQuery] = useState('');
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -24,35 +24,39 @@ function App() {
   const handleSearch = userData => {
     closeModal();
     setPhotos([]);
-    setSearchStored(userData);
-    setPage(page + 1);
-    fetchData(userData, page);
+    setQuery(userData);
+    setPage(1);
   };
 
-  async function fetchData(searchData, page) {
-    try {
-      setError(false);
-      setLoading(true);
-      const { results, total_pages } = await fetchPhotosByName(
-        searchData,
-        page
-      );
-      setShowBtn(total_pages && total_pages !== page);
-      if (searchData === searchStored) {
-        setPhotos([...photos, ...results]);
-      } else {
-        setPhotos(results);
-      }
-    } catch (error) {
-      setError(true);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (query === '') {
+      return;
     }
-  }
+    async function fetchData(searchData, page) {
+      try {
+        setError(false);
+        setLoading(true);
+        const { results, total_pages } = await fetchPhotosByName(
+          searchData,
+          page
+        );
+        setShowBtn(total_pages && total_pages !== page);
+        if (searchData === query) {
+          setPhotos(prevPhotos => [...prevPhotos, ...results]);
+        } else {
+          setPhotos(results);
+        }
+      } catch (error) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData(query, page);
+  }, [query, page]);
 
   function handleClick() {
     setPage(page + 1);
-    fetchData(searchStored, page);
     animateScroll.scrollToBottom({
       duration: 800, // тривалість анімації в мілісекундах
       smooth: 'easeInOutQuint', // згладжування анімації
